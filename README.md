@@ -16,11 +16,10 @@ ninebot-loon/
 
 ### 1. 安装插件
 
-1. 把 `ninebot.plugin` 中的两处 `OWNER` 替换成你的 GitHub 用户名（上传仓库后）。
-2. 在 Loon 中: `配置` → `插件` → 右上角 `+` → `从URL安装`，粘贴:
+1. 在 Loon 中: `配置` → `插件` → 右上角 `+` → `从URL安装`，粘贴（jsDelivr CDN，国内可直连）:
 
    ```
-   https://raw.githubusercontent.com/Rainbow3571/ninebot-loon/main/ninebot.plugin
+   https://cdn.jsdelivr.net/gh/Rainbow3571/ninebot-loon@main/ninebot.plugin
    ```
 
 ### 2. 信任 CA 证书（抓包必需）
