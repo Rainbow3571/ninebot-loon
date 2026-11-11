@@ -20,10 +20,10 @@ ninebot-loon/
 1. 在 Loon 中: `配置` → `插件` → 右上角 `+` → `从URL安装`，粘贴（jsDelivr CDN，国内可直连，自动取最新版）:
 
    ```
-   https://cdn.jsdelivr.net/gh/Rainbow3571/ninebot-loon@d3dd4d3556e5c88a436c40842f64f136cbfa3f3a/ninebot.plugin
+   https://cdn.jsdelivr.net/gh/Rainbow3571/ninebot-loon@20978a395d7ec34584d9688934c471d95cb7b071/ninebot.plugin
    ```
 
-   > 此链接绑定到已验证的具体提交，稳定可用。若想始终自动获取最新版本，把 `@d3dd4d3...` 换成 `@latest` 即可（jsDelivr 缓存刷新可能有数小时延迟）。
+   > 此链接绑定到已验证的具体提交，稳定可用。若想始终自动获取最新版本，把 `@20978a3...` 换成 `@latest` 即可（jsDelivr 缓存刷新可能有数小时延迟）。
 
 ### 2. 信任 CA 证书（抓包必需）
 
