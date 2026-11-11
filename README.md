@@ -9,7 +9,8 @@ ninebot-loon/
 ├── ninebot.plugin          # Loon 插件配置文件
 └── Scripts/
     ├── ninebot.token.js    # 抓包脚本: 自动提取 Authorization + device_id
-    └── ninebot.checkin.js  # 签到脚本: 每日定时签到 + 通知
+    ├── ninebot.checkin.js  # 签到脚本: 每日定时签到 + 通知
+    └── ninebot.view.js     # 手动脚本: 查看已保存的 Token
 ```
 
 ## 使用步骤
@@ -36,11 +37,26 @@ ninebot-loon/
 2. 打开九号 APP → 进入「签到」页面。
 3. 弹出通知「✅ 已保存」，即表示 Token 抓取成功。多账号可依次登录其他账号重复操作。
 
-### 4. 签到
+### 4. 查看已抓取的内容
+
+两种任选：
+
+- **一键查看（推荐）**：Loon → `脚本` → `手动脚本 / generic` → 点「九号Token查看」，会推送通知列出全部账号的 `deviceId` 和完整 `Authorization`；**点通知可复制完整 JSON**。
+- **Loon 自带**：Loon → `脚本` → `数据持久化` → `读取指定数据` → 输入 key `ninebot_accounts` → 复制全部内容。
+
+存储内容格式（key: `ninebot_accounts`）：
+
+```json
+{"accounts":[{"deviceId":"...","authorization":"Bearer ...","name":"账号1","updatedAt":1731300000000}]}
+```
+
+### 5. 签到
 
 - 插件默认每天 **08:30** 自动签到，可在 Loon 插件详情中修改 cron 时间。
 - 签到结果通过系统通知推送（含连续签到天数、今日能量值）。
 - 如通知提示 Token 失效，重新执行第 3 步即可。
+
+> 插件更新后，请在 Loon 插件页面刷新/重新安装插件，新脚本才会生效。
 
 ## 抓包/接口原理
 

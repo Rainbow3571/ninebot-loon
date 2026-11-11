@@ -43,17 +43,17 @@ function buildHeaders(authorization) {
 }
 
 function httpGet(url, headers) {
-  return new Promise((resolve, reject) => {
-    $httpClient.get({ url: url, headers: headers }, (status, response, data) => {
-      resolve({ status: status, data: data });
+  return new Promise((resolve) => {
+    $httpClient.get({ url: url, headers: headers }, (error, response, data) => {
+      resolve({ error: error, status: response && response.status, data: data });
     });
   });
 }
 
 function httpPost(url, headers, body) {
-  return new Promise((resolve, reject) => {
-    $httpClient.post({ url: url, headers: headers, body: body }, (status, response, data) => {
-      resolve({ status: status, data: data });
+  return new Promise((resolve) => {
+    $httpClient.post({ url: url, headers: headers, body: body }, (error, response, data) => {
+      resolve({ error: error, status: response && response.status, data: data });
     });
   });
 }
@@ -69,8 +69,8 @@ async function checkOne(account) {
     stBody = JSON.parse(st.data);
   } catch (e) {}
 
-  if (!stBody || stBody.code !== 0 || !stBody.data) {
-    const err = (stBody && stBody.msg) || "HTTP " + st.status + " / 无法解析响应";
+  if (st.error || !stBody || stBody.code !== 0 || !stBody.data) {
+    const err = st.error ? "请求失败: " + st.error : (stBody && stBody.msg) || "HTTP " + st.status + " / 无法解析响应";
     return { name: name, ok: false, msg: "Token 可能已失效: " + err };
   }
 
@@ -106,7 +106,7 @@ async function checkOne(account) {
     } catch (e) {}
   } else {
     result.ok = false;
-    result.msg = (sgBody && sgBody.msg) || "HTTP " + sg.status;
+    result.msg = sg.error ? "请求失败: " + sg.error : (sgBody && sgBody.msg) || "HTTP " + sg.status;
   }
   return result;
 }
