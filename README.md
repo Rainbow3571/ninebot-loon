@@ -10,7 +10,7 @@ ninebot-loon/
 └── Scripts/
     ├── ninebot.token.js    # 抓包脚本: 自动提取 Authorization + device_id
     ├── ninebot.checkin.js  # 签到脚本: 每日定时签到 + 通知
-    └── ninebot.view.js     # 手动脚本: 查看已保存的 Token
+    └── ninebot.view.js     # 可选手动脚本: 查看已保存的 Token
 ```
 
 ## 使用步骤
@@ -39,10 +39,13 @@ ninebot-loon/
 
 ### 4. 查看已抓取的内容
 
-两种任选：
+两种任选（都不需要额外装脚本）：
 
-- **一键查看（推荐）**：Loon → `脚本` → `手动脚本 / generic` → 点「九号Token查看」，会推送通知列出全部账号的 `deviceId` 和完整 `Authorization`；**点通知可复制完整 JSON**。
-- **Loon 自带**：Loon → `脚本` → `数据持久化` → `读取指定数据` → 输入 key `ninebot_accounts` → 复制全部内容。
+- **抓包通知（最直接）**：打开九号 APP 签到页后，「九号Token获取」通知里会显示完整的 `deviceId` 和 `Authorization`；**点通知会把完整 JSON 复制到剪贴板**。
+- **Loon 自带存储查看**：Loon → `脚本` → `数据持久化` → `读取指定数据` → 输入 key `ninebot_accounts` → 复制全部内容。
+- **脚本日志**：Loon → `脚本` / `日志` 里也能看到抓包脚本打印的完整 JSON。
+
+> 注：插件详情页只会显示 REQUEST + CRON 两条脚本，这是正常的。仓库里的 `Scripts/ninebot.view.js` 是一个可选的 generic 手动脚本，如需一键查看可自行在 Loon `插件 → + → 远程脚本` 中添加（类型选 Generic）。
 
 存储内容格式（key: `ninebot_accounts`）：
 

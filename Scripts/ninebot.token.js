@@ -55,9 +55,15 @@ if (!authorization || !deviceId) {
     });
   }
 
-  $persistentStore.write(JSON.stringify({ accounts: accounts }), STORE_KEY);
+  const saved = JSON.stringify({ accounts: accounts });
+  $persistentStore.write(saved, STORE_KEY);
 
-  const msg = "deviceId: " + deviceId + "\nAuthorization: " + authorization.slice(0, 20) + "...";
-  $notification.post("九号Token获取", "✅ 已保存 (共 " + accounts.length + " 个账号)", msg);
+  // 完整信息写入脚本日志, 并放进通知内容 (点通知可复制到剪贴板)
+  console.log("[" + STORE_KEY + "] " + saved);
+  const msg =
+    "deviceId: " + deviceId +
+    "\nAuthorization: " + authorization +
+    "\n保存的账号数: " + accounts.length;
+  $notification.post("九号Token获取", "✅ 已保存 (点通知复制完整数据)", msg, { clipboard: saved });
   $done({});
 }
