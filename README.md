@@ -20,7 +20,7 @@ ninebot-loon/
 2. 在 Loon 中: `配置` → `插件` → 右上角 `+` → `从URL安装`，粘贴:
 
    ```
-   https://raw.githubusercontent.com/<你的用户名>/ninebot-loon/main/ninebot.plugin
+   https://raw.githubusercontent.com/Rainbow3571/ninebot-loon/main/ninebot.plugin
    ```
 
 ### 2. 信任 CA 证书（抓包必需）
