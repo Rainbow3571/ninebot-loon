@@ -69,7 +69,8 @@ https://cdn.jsdelivr.net/gh/Rainbow3571/ninebot-loon@f67e513fffe2230dad42cd7f035
 九号出行签到 (1/1)
 ✅ 账号1 · 今日签到完成
   连续签到 7 天
-  今日获得 N币 +15 (todayPoints=5)
+  今日获得 N币 +10
+  今日数值字段: todayPoints=5
   N币余额: nCoinBalance=128
   🎁 盲盒 2/2 个: 3天盲盒 · N币 +10、经验值 +5
 ```

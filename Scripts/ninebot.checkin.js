@@ -231,9 +231,9 @@ async function checkOne(account) {
   }
 
   const fields = fieldLines(info);
-  const statusGain = Number(info.todayPoints || info.todayN || info.todayNCoin || 0);
-  // 今日获得 N币 = 签到奖励 + 盲盒奖励 + status 中今日字段
-  const todayN = signN + box.nCoin + (statusGain > 0 ? statusGain : 0);
+  // 明确的 N币只统计奖励对象里 rewardType=2 的部分 (签到奖励 + 盲盒奖励)
+  // status 里的 todayPoints 可能是「能量值」, 单独作为原始字段展示, 不混入 N币
+  const todayN = signN + box.nCoin;
 
   return {
     name: name,
@@ -273,7 +273,8 @@ async function checkOne(account) {
       successCount++;
       lines.push("✅ " + r.name + (r.justSigned ? " · 今日签到完成" : " · 今日已签到"));
       lines.push("  连续签到 " + r.consecutiveDays + " 天");
-      lines.push("  今日获得 N币 +" + r.todayN + (r.gainText ? " (" + r.gainText + ")" : ""));
+      lines.push("  今日获得 N币 +" + r.todayN);
+      if (r.gainText) lines.push("  今日数值字段: " + r.gainText);
       lines.push("  N币余额: " + r.balanceText);
       lines.push("  " + r.boxText);
     } else {
