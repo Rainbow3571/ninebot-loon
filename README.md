@@ -1,15 +1,22 @@
-# 九号出行 Loon 签到插件
+# 九号出行 Loon 签到插件 (v4)
 
-基于 [waistu/Ninebot](https://github.com/waistu/Ninebot) 项目的接口实现，适配 Loon 插件格式。
+基于 [waistu/Ninebot](https://github.com/waistu/Ninebot) 与 [Qcby/QcbyScript](https://github.com/Qcby/QcbyScript) 的接口实现，适配 Loon 插件格式。
+
+## 功能
+
+- 每日定时签到，通知显示 **连续签到天数 / 今日获得 N币 / N币余额**
+- **自动开启惊喜盲盒**（连签奖励），并列出每个盲盒开出的奖励（N币、经验值、勋章、补签卡、抵扣券）
+- **抓取 Token 手动开关**：默认关闭，平时进 APP 完全不弹通知；需要重抓时手动打开
+- 抓包成功通知含完整 `Authorization`，**点通知复制完整 JSON**
 
 ## 文件结构
 
 ```
 ninebot-loon/
-├── ninebot.plugin          # Loon 插件配置文件
+├── ninebot.plugin          # Loon 插件配置 (含 [Argument] 抓包开关)
 └── Scripts/
-    ├── ninebot.token.js    # 抓包脚本: 自动提取 Authorization + device_id
-    ├── ninebot.checkin.js  # 签到脚本: 每日定时签到 + 通知
+    ├── ninebot.token.js    # 抓包脚本 (受开关控制)
+    ├── ninebot.checkin.js  # 签到 + 盲盒 + 统计脚本
     └── ninebot.view.js     # 可选手动脚本: 查看已保存的 Token
 ```
 
@@ -17,55 +24,70 @@ ninebot-loon/
 
 ### 1. 安装插件
 
-1. 在 Loon 中: `配置` → `插件` → 右上角 `+` → `从URL安装`，粘贴（jsDelivr CDN，国内可直连，自动取最新版）:
+Loon → `配置` → `插件` → 右上角 `+` → `从URL安装`，粘贴（jsDelivr CDN，国内可直连，已验证）：
 
-   ```
-   https://cdn.jsdelivr.net/gh/Rainbow3571/ninebot-loon@20978a395d7ec34584d9688934c471d95cb7b071/ninebot.plugin
-   ```
+```
+https://cdn.jsdelivr.net/gh/Rainbow3571/ninebot-loon@f67e513fffe2230dad42cd7f035257086557aa2f/ninebot.plugin
+```
 
-   > 此链接绑定到已验证的具体提交，稳定可用。若想始终自动获取最新版本，把 `@20978a3...` 换成 `@latest` 即可（jsDelivr 缓存刷新可能有数小时延迟）。
+> 插件详情页「详细」里显示 **v4** 即为最新版。想跟随最新版可把 `@f67e513...` 换成 `@latest`（jsDelivr 缓存可能滞后数小时）。
 
 ### 2. 信任 CA 证书（抓包必需）
 
 1. Loon → `配置` → `通用` → `MITM` → 生成 CA 证书。
 2. iOS 系统设置安装描述文件并信任；再在 `关于本机` → `证书信任设置` 中开启完全信任。
-3. Loon → `配置` → `插件` → 选中本插件 → 确认 `MITM Overridden Hostname` 包含 `cn-cbu-gateway.ninebot.com`。
+3. 确认插件页「主机名」包含 `cn-cbu-gateway.ninebot.com`。
 
-### 3. 抓取 Token
+### 3. 抓取 Token（一次性，抓完就关）
 
-1. 开启 Loon 的 MITM（打开开关）。
-2. 打开九号 APP → 进入「签到」页面。
-3. 弹出通知「✅ 已保存」，即表示 Token 抓取成功。多账号可依次登录其他账号重复操作。
+1. 插件详情页把 **「抓取Token开关」打开**。
+2. 打开 Loon 的 MITM，进入九号 APP「签到」页面。
+3. 收到「✅ 九号Token获取」通知即成功（点通知可复制完整 JSON）。
+4. **回插件页把开关关掉**，之后进 APP 不会再弹任何通知。
+
+> 为什么以前一下成功一下失败：签到页会同时发 `status`（请求头带 `device_id`，抓取成功）和 `sign`（deviceId 在 body 里，请求头没有）两类请求。v4 对抓不到凭证的请求**静默跳过**，不再发失败通知，并做了 60 秒内重复去重。
+
+**开关不生效时的兜底**：Loon → `脚本` → `数据持久化` → `导入指定数据`，key 填 `ninebot_capture`，value 填 `1` 即强制开启；不需要时把这个 key 删掉。
 
 ### 4. 查看已抓取的内容
 
-两种任选（都不需要额外装脚本）：
+- **抓包通知**：开关打开时通知里就是完整 `deviceId` + `Authorization`。
+- **Loon 数据持久化**：`脚本` → `数据持久化` → `读取指定数据` → key `ninebot_accounts`。
+- **脚本日志**：Loon 日志里也会打印完整 JSON。
 
-- **抓包通知（最直接）**：打开九号 APP 签到页后，「九号Token获取」通知里会显示完整的 `deviceId` 和 `Authorization`；**点通知会把完整 JSON 复制到剪贴板**。
-- **Loon 自带存储查看**：Loon → `脚本` → `数据持久化` → `读取指定数据` → 输入 key `ninebot_accounts` → 复制全部内容。
-- **脚本日志**：Loon → `脚本` / `日志` 里也能看到抓包脚本打印的完整 JSON。
-
-> 注：插件详情页只会显示 REQUEST + CRON 两条脚本，这是正常的。仓库里的 `Scripts/ninebot.view.js` 是一个可选的 generic 手动脚本，如需一键查看可自行在 Loon `插件 → + → 远程脚本` 中添加（类型选 Generic）。
-
-存储内容格式（key: `ninebot_accounts`）：
+存储格式：
 
 ```json
 {"accounts":[{"deviceId":"...","authorization":"Bearer ...","name":"账号1","updatedAt":1731300000000}]}
 ```
 
-### 5. 签到
+> 插件详情页只显示 REQUEST + CRON 两条脚本是正常的（Loon 不展示 generic 手动脚本）。
 
-- 插件默认每天 **08:30** 自动签到，可在 Loon 插件详情中修改 cron 时间。
-- 签到结果通过系统通知推送（含连续签到天数、今日能量值）。
-- 如通知提示 Token 失效，重新执行第 3 步即可。
+### 5. 签到通知示例
 
-> 插件更新后，请在 Loon 插件页面刷新/重新安装插件，新脚本才会生效。
+```
+九号出行签到 (1/1)
+✅ 账号1 · 今日签到完成
+  连续签到 7 天
+  今日获得 N币 +15 (todayPoints=5)
+  N币余额: nCoinBalance=128
+  🎁 盲盒 2/2 个: 3天盲盒 · N币 +10、经验值 +5
+```
 
-## 抓包/接口原理
+- **点击通知会复制全部原始响应 JSON**（status / blind-box / 签到奖励）。
+- `N币余额` 由脚本自动扫描 `status` 响应里的数值字段识别；若显示「未识别」，把点通知复制到的原始数据发出来，即可精确适配字段名。
+- 默认每天 **08:30** 执行；Token 失效时通知会提示，重做第 3 步即可。
 
-- 签到: `POST https://cn-cbu-gateway.ninebot.com/portal/api/user-sign/v2/sign`，body `{"deviceId": "..."}`，请求头携带 `Authorization: Bearer ...` 与 `device_id`。
-- 状态: `GET https://cn-cbu-gateway.ninebot.com/portal/api/user-sign/v2/status`
-- `code === 0` 为成功；`data.currentSignStatus === 1` 表示今日已签。
+## 接口清单
+
+| 接口 | 方法 | 说明 |
+|---|---|---|
+| `/portal/api/user-sign/v2/status?t=<ts>` | GET | 签到状态、连续天数、N币相关字段 |
+| `/portal/api/user-sign/v2/sign` | POST | body `{"deviceId":"..."}`，`code=540004` 视为已签到 |
+| `/portal/api/user-sign/v2/blind-box/list?t=<ts>` | GET | `data.notOpenedBoxes[]`：`rewardStatus=1` 且 `blindBoxIds` 非空即可开 |
+| `/portal/api/user-sign/v2/blind-box/receive` | POST | body `{"rewardId":"..."}`，`data.rewardType=2` 即 N币 |
+
+所有请求头需带 `Authorization`、`device_id`、`Origin: https://h5-bj.ninebot.com` 等；漏掉 `device_id` 会导致奖励返回 0。
 
 ## 免责声明
 
